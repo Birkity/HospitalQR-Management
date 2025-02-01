@@ -7,7 +7,7 @@
     <script>
         const chapa = new ChapaCheckout({
             publicKey: '{{ chapa_public_key }}',
-            amount: '100',
+            amount: '100',  // This should be dynamic based on the appointment
             currency: 'ETB',
             availablePaymentMethods: ['telebirr', 'cbebirr', 'ebirr', 'mpesa', 'chapa'],
             customizations: {
@@ -29,7 +29,7 @@
                 alert('Payment failed: ' + error.message);
             },
             onClose: function() {
-               
+                // This could be used to handle scenarios where the user closes the payment window
                 alert('Payment process closed');
             }
         });
