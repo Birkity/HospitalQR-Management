@@ -1,6 +1,5 @@
 from pymongo import MongoClient
 from bson.objectid import ObjectId
-from werkzeug.security import generate_password_hash, check_password_hash
 from ..config import Config
 
 client = MongoClient(Config.MONGODB_URI)
@@ -20,3 +19,7 @@ class Payment:
     @staticmethod
     def find_by_transaction_id(transaction_id):
         return db.payments.find_one({"transaction_id": transaction_id})
+
+    @staticmethod
+    def update_one(query, update):
+        db.payments.update_one(query, update)
