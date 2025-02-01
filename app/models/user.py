@@ -11,7 +11,7 @@ class User(UserMixin):
     def __init__(self, username, email, password, role, _id=None):
         self.username = username
         self.email = email
-        self.password = password
+        self.password_hash = generate_password_hash(password) if password else None
         self.role = role
         self._id = _id
 
@@ -21,28 +21,37 @@ class User(UserMixin):
     @staticmethod
     def create_from_db(user_data):
         """Convert a database user dictionary to a User object"""
-        return User(
-            username=user_data['username'],
-            email=user_data['email'],
-            password=user_data['password'],
-            role=user_data['role'],
-            _id=user_data['_id']
-        )
+        if user_data:
+            return User(
+                username=user_data.get('username'),
+                email=user_data.get('email'),
+                password=None,  # We don't need to pass the password here
+                role=user_data.get('role'),
+                _id=user_data.get('_id')
+            )
+        return None
 
     def save_to_db(self):
-        user_data = self.__dict__.copy()
-        del user_data['password']  # Don't save the plain password
-        user_data['password_hash'] = generate_password_hash(self.password)
-        return db.users.insert_one(user_data).inserted_id
+        user_data = {
+            'username': self.username,
+            'email': self.email,
+            'password_hash': self.password_hash,
+            'role': self.role
+        }
+        result = db.users.insert_one(user_data)
+        self._id = result.inserted_id
+        return self._id
 
     @staticmethod
     def find_by_email(email):
-        user = db.users.find_one({"email": email})
-        if user:
-            user['id'] = str(user['_id'])
-            del user['_id']
-        return user
+        return db.users.find_one({'email': email})
 
     @staticmethod
-    def verify_password(stored_password, provided_password):
-        return check_password_hash(stored_password, provided_password)
+    def verify_password(user_data, password):
+        if not user_data or 'password_hash' not in user_data:
+            return False
+        return check_password_hash(user_data['password_hash'], password)
+
+    @staticmethod
+    def find_by_id(user_id):
+        return db.users.find_one({'_id': user_id})

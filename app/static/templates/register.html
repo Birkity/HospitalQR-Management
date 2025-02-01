@@ -30,12 +30,22 @@
 
                 <div>
                     {{ form.password.label(class="block text-sm font-medium text-gray-700 mb-1") }}
-                    {{ form.password(class="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm", placeholder="Create a password") }}
+                    <div class="relative">
+                        {{ form.password(class="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm", placeholder="Create a password", id="password") }}
+                        <button type="button" onclick="togglePasswordVisibility('password')" class="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5">
+                            Show
+                        </button>
+                    </div>
                 </div>
 
                 <div>
                     {{ form.confirm_password.label(class="block text-sm font-medium text-gray-700 mb-1") }}
-                    {{ form.confirm_password(class="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm", placeholder="Confirm your password") }}
+                    <div class="relative">
+                        {{ form.confirm_password(class="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm", placeholder="Confirm your password", id="confirm_password") }}
+                        <button type="button" onclick="togglePasswordVisibility('confirm_password')" class="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5">
+                            Show
+                        </button>
+                    </div>
                 </div>
 
                 <div>
@@ -54,4 +64,15 @@
         </div>
     </div>
 </div>
+
+<script>
+function togglePasswordVisibility(id) {
+    var passwordField = document.getElementById(id);
+    if (passwordField.type === "password") {
+        passwordField.type = "text";
+    } else {
+        passwordField.type = "password";
+    }
+}
+</script>
 {% endblock %}

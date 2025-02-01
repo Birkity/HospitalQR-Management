@@ -36,9 +36,10 @@ def register():
 def login():
     form = LoginForm()
     if form.validate_on_submit():
-        user = User.find_by_email(form.email.data)
-        if user and User.verify_password(user['password'], form.password.data):
-            login_user(User.create_from_db(user))  # Convert db user to User object
+        user_data = User.find_by_email(form.email.data)
+        if user_data and User.verify_password(user_data, form.password.data):
+            user = User.create_from_db(user_data)
+            login_user(user)
             flash('Login successful!', 'success')
             return redirect(url_for('main.index'))
         flash('Login unsuccessful. Please check email and password.', 'danger')
