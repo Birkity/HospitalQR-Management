@@ -1,5 +1,5 @@
 from flask import Flask
-from config import Config
+from .config import Config
 from flask_wtf.csrf import CSRFProtect
 
 def create_app():
