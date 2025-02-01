@@ -6,7 +6,7 @@
     <script src="https://js.chapa.co/v1/inline.js"></script>
     <script>
         const chapa = new ChapaCheckout({
-            publicKey: '{{ config.CHAPA_PUBLIC_KEY }}',
+            publicKey: '{{ chapa_public_key }}',
             amount: '100',
             currency: 'ETB',
             availablePaymentMethods: ['telebirr', 'cbebirr', 'ebirr', 'mpesa', 'chapa'],
@@ -29,7 +29,7 @@
                 alert('Payment failed: ' + error.message);
             },
             onClose: function() {
-                
+               
                 alert('Payment process closed');
             }
         });
