@@ -5,6 +5,7 @@ from flask_wtf.csrf import CSRFProtect
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
+    app.template_folder = 'static/templates'
 
     # Import and register blueprints correctly
     from .routes.auth import auth_bp

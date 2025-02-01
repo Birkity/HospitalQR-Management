@@ -1,7 +1,64 @@
 {% extends "base.html" %}
 {% block content %}
-    <h1>Welcome to Hospital Management</h1>
-    <a href="{{ url_for('auth.login') }}">Login</a> | 
-    <a href="{{ url_for('auth.register') }}">Register</a> |
-    <a href="{{ url_for('main.manage_appointments') }}">Book Appointment</a>
+<div class="bg-white rounded-lg shadow-xl overflow-hidden">
+    <!-- Hero Section -->
+    <div class="relative bg-blue-600 h-96">
+        <div class="absolute inset-0">
+            <img class="w-full h-full object-cover" src="{{ url_for('static', filename='images/hospital-hero.jpg') }}" alt="Hospital">
+            <div class="absolute inset-0 bg-blue-600 mix-blend-multiply"></div>
+        </div>
+        <div class="relative max-w-7xl mx-auto py-24 px-4 sm:py-32 sm:px-6 lg:px-8">
+            <h1 class="text-4xl font-extrabold tracking-tight text-white sm:text-5xl lg:text-6xl">Welcome to Hospital Management</h1>
+            <p class="mt-6 text-xl text-white max-w-3xl">Your digital healthcare companion. Experience seamless medical services with our cardless system.</p>
+        </div>
+    </div>
+
+    <!-- Features Section -->
+    <div class="max-w-7xl mx-auto px-4 py-12 sm:px-6 lg:py-16 lg:px-8">
+        <div class="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
+            <!-- Feature 1 -->
+            <div class="p-6 bg-gray-50 rounded-lg">
+                <div class="text-blue-600 mb-4">
+                    <i class="fas fa-qrcode text-3xl"></i>
+                </div>
+                <h3 class="text-lg font-medium text-gray-900">Digital ID System</h3>
+                <p class="mt-2 text-gray-500">Access your medical information instantly with our QR code system.</p>
+            </div>
+
+            <!-- Feature 2 -->
+            <div class="p-6 bg-gray-50 rounded-lg">
+                <div class="text-blue-600 mb-4">
+                    <i class="fas fa-calendar-check text-3xl"></i>
+                </div>
+                <h3 class="text-lg font-medium text-gray-900">Easy Appointments</h3>
+                <p class="mt-2 text-gray-500">Book and manage your appointments with just a few clicks.</p>
+            </div>
+
+            <!-- Feature 3 -->
+            <div class="p-6 bg-gray-50 rounded-lg">
+                <div class="text-blue-600 mb-4">
+                    <i class="fas fa-credit-card text-3xl"></i>
+                </div>
+                <h3 class="text-lg font-medium text-gray-900">Secure Payments</h3>
+                <p class="mt-2 text-gray-500">Make hassle-free payments using various payment methods.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- CTA Section -->
+    <div class="bg-gray-50 py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center">
+                <div class="space-x-4">
+                    <a href="{{ url_for('auth.register') }}" class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">
+                        Register Now
+                    </a>
+                    <a href="{{ url_for('main.manage_appointments') }}" class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-blue-600 bg-white hover:bg-gray-50 border-blue-600">
+                        Book Appointment
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
