@@ -1,51 +1,36 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="min-h-screen py-12 px-4 sm:px-6 lg:px-8 relative">
-    <!-- Background Pattern -->
-    <div class="absolute inset-0 z-0">
-        <div class="absolute inset-0 bg-gradient-to-br from-blue-50 to-blue-100 opacity-70"></div>
-        <div class="absolute inset-0" style="background-image: url('data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%234A90E2' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');"></div>
-    </div>
-
-    <div class="max-w-3xl mx-auto relative z-10">
-        <!-- Profile Card -->
-        <div class="bg-white py-8 px-6 shadow-xl rounded-xl backdrop-blur-lg bg-opacity-90">
-            <div class="text-center mb-8">
-                <h2 class="text-3xl font-bold text-gray-900 mb-2">Your Profile</h2>
-                <p class="text-sm text-gray-600">Manage your account and view your digital ID</p>
+<div class="min-h-screen py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-3xl mx-auto">
+        <div class="bg-white shadow-xl rounded-lg overflow-hidden">
+            <!-- Profile Header -->
+            <div class="px-6 py-4 bg-blue-600">
+                <h2 class="text-2xl font-bold text-white">Patient Profile</h2>
             </div>
 
-            <!-- Profile Information -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <!-- Personal Info -->
-                <div class="space-y-6">
-                    <div>
-                        <h3 class="text-lg font-medium text-gray-900 mb-4">Personal Information</h3>
-                        <div class="bg-gray-50 rounded-lg p-4 space-y-3">
-                            <div class="flex justify-between">
-                                <span class="text-gray-500">Name</span>
-                                <span class="font-medium">{{ current_user.username }}</span>
-                            </div>
-                            <div class="flex justify-between">
-                                <span class="text-gray-500">Email</span>
-                                <span class="font-medium">{{ current_user.email }}</span>
-                            </div>
-                            <div class="flex justify-between">
-                                <span class="text-gray-500">Member Since</span>
-                                <span class="font-medium">{{ current_user.created_at.strftime('%Y-%m-%d') }}</span>
-                            </div>
+            <!-- Profile Content -->
+            <div class="p-6">
+                <!-- Patient Information -->
+                <div class="mb-8">
+                    <h3 class="text-lg font-medium text-gray-900 mb-4">Personal Information</h3>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <p class="text-sm text-gray-500">Name</p>
+                            <p class="font-medium">{{ patient.name }}</p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500">Email</p>
+                            <p class="font-medium">{{ patient.email }}</p>
                         </div>
                     </div>
                 </div>
 
                 <!-- QR Code -->
-                <div class="space-y-6">
-                    <div>
-                        <h3 class="text-lg font-medium text-gray-900 mb-4">Digital ID</h3>
-                        <div class="bg-gray-50 rounded-lg p-4 text-center">
-                            <img src="{{ qr_code }}" alt="QR Code" class="mx-auto max-w-[200px] rounded-lg shadow-md">
-                            <p class="text-sm text-gray-600 mt-4">Show this QR code during your hospital visits</p>
-                        </div>
+                <div>
+                    <h3 class="text-lg font-medium text-gray-900 mb-4">Digital ID</h3>
+                    <div class="bg-gray-50 rounded-lg p-4 text-center">
+                        <img src="{{ qr_code }}" alt="QR Code" class="mx-auto max-w-[200px]">
+                        <p class="text-sm text-gray-600 mt-4">Show this QR code during your hospital visits</p>
                     </div>
                 </div>
             </div>

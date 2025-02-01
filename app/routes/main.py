@@ -1,7 +1,7 @@
 import datetime
 from flask import abort, render_template, redirect, session, url_for, flash, request, current_app
 from . import main_bp
-from ..models import User, Appointment, Doctor, Payment
+from ..models import User, Appointment, Doctor, Payment, Patient
 from ..services import generate_qr_code
 from flask import Blueprint  
 from flask_login import login_required, current_user
@@ -20,16 +20,51 @@ def test():
 @login_required
 def manage_appointments():
     if request.method == 'POST':
-        patient_id = current_user.get_id()  # Get ID from current_user
+        patient_id = current_user.get_id()
         doctor_id = request.form['doctor_id']
         appointment_date = request.form['appointment_date']
         appointment_time = request.form['appointment_time']
         notes = request.form.get('notes', "")
         
-        appointment = Appointment(patient_id, doctor_id, appointment_date, appointment_time, "scheduled", notes)
+        # Create appointment
+        appointment = Appointment(
+            patient_id=patient_id,
+            doctor_id=doctor_id,
+            appointment_date=appointment_date,
+            appointment_time=appointment_time,
+            status="pending",
+            notes=notes
+        )
         appointment_id = appointment.save_to_db()
         
-        return redirect(url_for('main.payment', appointment_id=appointment_id))
+        # Initialize payment
+        chapa = current_app.config['CHAPA_API']
+        amount = 500  # Set your consultation fee
+        tx_ref = f"tx-{appointment_id}"
+        
+        payment_data = chapa.initialize_payment(
+            amount=amount,
+            email=current_user.email,
+            first_name=current_user.username.split()[0],
+            last_name=current_user.username.split()[-1],
+            tx_ref=tx_ref
+        )
+        
+        if payment_data.get('status') == 'success':
+            # Save payment record
+            payment = Payment(
+                appointment_id=str(appointment_id),
+                amount=amount,
+                payment_method="chapa",
+                status="pending",
+                transaction_id=tx_ref
+            )
+            payment.save_to_db()
+            
+            return redirect(payment_data['data']['checkout_url'])
+        
+        flash('Payment initialization failed. Please try again.', 'error')
+        return redirect(url_for('main.appointments'))
     
     doctors = Doctor.list_all()
     return render_template('appointments.html', doctors=doctors)
@@ -101,7 +136,11 @@ def admin_dashboard():
                            monthly_revenue=monthly_revenue)
 
 @main_bp.route('/profile')
+@login_required
 def profile():
-    user = User.find_by_email('current_user_email') 
-    qr_code = generate_qr_code(user['qr_code'])
-    return render_template('profile.html', qr_code=qr_code)
+    user_id = current_user.get_id()
+    patient = Patient.find_by_id(user_id)
+    if patient:
+        qr_code = patient.generate_qr_code()
+        return render_template('profile.html', patient=patient, qr_code=qr_code)
+    return redirect(url_for('main.index'))

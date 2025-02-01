@@ -1,6 +1,10 @@
 from pymongo import MongoClient
 from ..config import Config
 from datetime import datetime
+from bson import ObjectId
+import qrcode
+import base64
+from io import BytesIO
 
 client = MongoClient(Config.MONGODB_URI)
 db = client.hospital_db
@@ -62,6 +66,34 @@ class Patient:
             ]
             db.patients.insert_many(dummy_patients)
 
+    def generate_qr_code(self):
+        """Generate QR code containing patient information"""
+        patient_data = {
+            'id': str(self._id),
+            'name': self.name,
+            'email': self.email
+        }
+        
+        # Create QR code
+        qr = qrcode.QRCode(
+            version=1,
+            error_correction=qrcode.constants.ERROR_CORRECT_L,
+            box_size=10,
+            border=4,
+        )
+        qr.add_data(str(patient_data))
+        qr.make(fit=True)
+
+        # Create image
+        img = qr.make_image(fill_color="black", back_color="white")
+        
+        # Convert to base64 for displaying in HTML
+        buffered = BytesIO()
+        img.save(buffered, format="PNG")
+        return f"data:image/png;base64,{base64.b64encode(buffered.getvalue()).decode()}"
+
     @staticmethod
     def find_by_id(patient_id):
+        if isinstance(patient_id, str):
+            patient_id = ObjectId(patient_id)
         return db.patients.find_one({'_id': patient_id}) 
