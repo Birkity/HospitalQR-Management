@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block content %}
+    <h2>Make an Appointment</h2>
+    <form method="post">
+        <select name="doctor_id" required>
+            {% for doctor in doctors %}
+                <option value="{{ doctor._id }}">{{ doctor.name }} ({{ doctor.specialty }})</option>
+            {% endfor %}
+        </select>
+        <input type="date" name="appointment_date" required>
+        <input type="time" name="appointment_time" required>
+        <textarea name="notes" placeholder="Notes"></textarea>
+        <input type="hidden" name="patient_id" value="patient_id_here">  <!-- This should be dynamic -->
+        <button type="submit">Book Appointment</button>
+    </form>
+{% endblock %}
