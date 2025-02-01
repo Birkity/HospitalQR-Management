@@ -15,7 +15,7 @@ class Doctor:
 
     @staticmethod
     def list_all():
-        return list(db.doctors.find())
+        return db.doctors.find()
 
     @staticmethod
     def initialize_dummy_data():

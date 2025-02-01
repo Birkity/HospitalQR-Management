@@ -20,3 +20,11 @@ class Appointment:
     @staticmethod
     def find_by_id(appointment_id):
         return db.appointments.find_one({"_id": ObjectId(appointment_id)})
+
+    @staticmethod
+    def find_all():
+        return db.appointments.find()
+
+    @staticmethod
+    def find_by_patient_id(patient_id):
+        return db.appointments.find({'patient_id': patient_id})

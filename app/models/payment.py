@@ -23,3 +23,11 @@ class Payment:
     @staticmethod
     def update_one(query, update):
         db.payments.update_one(query, update)
+
+    @staticmethod
+    def find_all():
+        return db.payments.find()
+
+    @staticmethod
+    def find_by_patient_id(patient_id):
+        return db.payments.find({'patient_id': patient_id})
