@@ -2,7 +2,7 @@ from flask import render_template, redirect, url_for, flash, request
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField
 from wtforms.validators import DataRequired, Email, EqualTo
-from . import auth
+from . import auth_bp
 from ..models import User
 
 class RegistrationForm(FlaskForm):
@@ -17,7 +17,7 @@ class LoginForm(FlaskForm):
     password = PasswordField('Password', validators=[DataRequired()])
     submit = SubmitField('Login')
 
-@auth.route('/register', methods=['GET', 'POST'])
+@auth_bp.route('/register', methods=['GET', 'POST'])
 def register():
     form = RegistrationForm()
     if form.validate_on_submit():
@@ -27,7 +27,7 @@ def register():
         return redirect(url_for('auth.login'))
     return render_template('register.html', form=form)
 
-@auth.route('/login', methods=['GET', 'POST'])
+@auth_bp.route('/login', methods=['GET', 'POST'])
 def login():
     form = LoginForm()
     if form.validate_on_submit():

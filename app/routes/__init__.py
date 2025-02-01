@@ -1,6 +1,4 @@
 from flask import Blueprint
 
-main = Blueprint('main', __name__)
-auth = Blueprint('auth', __name__)
-
-from . import main, auth
+auth_bp = Blueprint('auth', __name__)
+main_bp = Blueprint('main', __name__)

@@ -1,14 +1,18 @@
 import datetime
 from flask import abort, render_template, redirect, session, url_for, flash, request, current_app
-from . import main
+from . import main_bp
 from ..models import User, Appointment, Doctor, Payment
 from ..services import generate_qr_code
 
-@main.route('/')
+@main_bp.route('/')
 def index():
     return render_template('index.html')
 
-@main.route('/appointments', methods=['GET', 'POST'])
+@main_bp.route('/test')
+def test():
+    return "Test route is working!"
+
+@main_bp.route('/appointments', methods=['GET', 'POST'])
 def manage_appointments():
     if request.method == 'POST':
         patient_id = request.form['patient_id']
@@ -25,11 +29,11 @@ def manage_appointments():
     doctors = Doctor.list_all()
     return render_template('appointments.html', doctors=doctors)
 
-@main.route('/payment/<appointment_id>')
+@main_bp.route('/payment/<appointment_id>')
 def payment(appointment_id):
     return render_template('payment.html', chapa_public_key=current_app.config['CHAPA_PUBLIC_KEY'], appointment_id=appointment_id)
 
-@main.route('/payment_callback', methods=['GET', 'POST'])
+@main_bp.route('/payment_callback', methods=['GET', 'POST'])
 def payment_callback():
     tx_ref = request.args.get('tx_ref')
     if tx_ref:
@@ -49,31 +53,27 @@ def payment_callback():
         flash('Transaction reference not provided.', 'error')
     return redirect(url_for('main.index'))
 
-@main.route('/payment_success')
+@main_bp.route('/payment_success')
 def payment_success():
     return render_template('payment_success.html')
 
-@main.route('/admin')
+@main_bp.route('/admin')
 def admin_dashboard():
     if 'user' not in session or not session['user'].get('is_admin'):
         abort(403)  # Forbidden if not admin
 
     try:
-        # Fetch data for the admin dashboard
         patient_visits = list(Appointment.find().sort("appointment_date", -1).limit(10))
-        payment_records = list(Payment.find().sort("created_at", -1).limit(10))  # Assuming 'created_at' exists
+        payment_records = list(Payment.find().sort("created_at", -1).limit(10))
         doctors = Doctor.list_all()
         doctors_count = len(doctors)
-        
-        # Most visited doctor
+
         most_visited_doctor = max(doctors, key=lambda d: Appointment.count_documents({"doctor_id": str(d['_id'])}), default=None)
         if most_visited_doctor:
             most_visited_doctor['visit_count'] = Appointment.count_documents({"doctor_id": str(most_visited_doctor['_id'])})
-        
-        # Payment trends 
+
         total_paid = sum(payment['amount'] for payment in payment_records)
-        
-        # Monthly revenue
+
         today = datetime.datetime.now()
         start_of_month = datetime.datetime(today.year, today.month, 1)
         monthly_revenue = Payment.aggregate([
@@ -95,7 +95,7 @@ def admin_dashboard():
                            total_paid=total_paid,
                            monthly_revenue=monthly_revenue)
 
-@main.route('/profile')
+@main_bp.route('/profile')
 def profile():
     user = User.find_by_email('current_user_email') 
     qr_code = generate_qr_code(user['qr_code'])
