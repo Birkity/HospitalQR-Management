@@ -1,13 +1,14 @@
 {% extends "base.html" %}
 {% block content %}
     <h2>Make Payment</h2>
+    <p>Amount: {{ price }} ETB</p>
     <div id="chapa-inline-form"></div>
 
     <script src="https://js.chapa.co/v1/inline.js"></script>
     <script>
         const chapa = new ChapaCheckout({
             publicKey: '{{ chapa_public_key }}',
-            amount: '100',  // This should be dynamic based on the appointment
+            amount: '{{ price }}', 
             currency: 'ETB',
             availablePaymentMethods: ['telebirr', 'cbebirr', 'ebirr', 'mpesa', 'chapa'],
             customizations: {
