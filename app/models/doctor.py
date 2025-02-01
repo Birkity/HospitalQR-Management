@@ -1,6 +1,4 @@
 from pymongo import MongoClient
-from bson.objectid import ObjectId
-from werkzeug.security import generate_password_hash, check_password_hash
 from ..config import Config
 
 client = MongoClient(Config.MONGODB_URI)
