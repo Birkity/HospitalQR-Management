@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block content %}
+    <h2>Make Payment</h2>
+    <div id="chapa-inline-form"></div>
+
+    <script src="https://js.chapa.co/v1/inline.js"></script>
+    <script>
+        const chapa = new ChapaCheckout({
+            publicKey: '{{ config.CHAPA_PUBLIC_KEY }}',
+            amount: '100',
+            currency: 'ETB',
+            availablePaymentMethods: ['telebirr', 'cbebirr', 'ebirr', 'mpesa', 'chapa'],
+            customizations: {
+                buttonText: 'Pay Now',
+                styles: `
+                    .chapa-pay-button { 
+                        background-color: #4CAF50; 
+                        color: white;
+                    }
+                `
+            },
+            callbackUrl: '{{ url_for("main.payment_callback", _external=True) }}',
+            returnUrl: '{{ url_for("main.payment_success", _external=True) }}',
+            onSuccessfulPayment: function(response) {
+                alert('Payment was successful!');
+                // Here you might want to redirect or update the page
+            },
+            onPaymentFailure: function(error) {
+                alert('Payment failed: ' + error.message);
+            },
+            onClose: function() {
+                
+                alert('Payment process closed');
+            }
+        });
+
+        chapa.initialize('chapa-inline-form');
+    </script>
+{% endblock %}
