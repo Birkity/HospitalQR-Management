@@ -1,26 +1,112 @@
 {% extends "base.html" %}
 {% block content %}
-    <h2>Admin Dashboard</h2>
-    <section>
-        <h3>Patient Visit History</h3>
-        <ul>
-            <!-- Here you would list patient visits -->
-        </ul>
-    </section>
-    <section>
-        <h3>Payment Records</h3>
-        <ul>
-            <!-- Here you would list payment transactions -->
-        </ul>
-    </section>
-    <section>
-        <h3>Doctor Schedules</h3>
-        <ul>
-            <!-- Here you would list doctors and their availability -->
-        </ul>
-    </section>
-    <section>
-        <h3>Patient Statistics</h3>
-        <!-- Here you might include charts or summary stats -->
-    </section>
+<div class="min-h-screen py-12 px-4 sm:px-6 lg:px-8 relative">
+    <!-- Background Pattern -->
+    <div class="absolute inset-0 z-0">
+        <div class="absolute inset-0 bg-gradient-to-br from-blue-50 to-blue-100 opacity-70"></div>
+        <div class="absolute inset-0" style="background-image: url('data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%234A90E2' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');"></div>
+    </div>
+
+    <div class="max-w-7xl mx-auto relative z-10">
+        <!-- Dashboard Header -->
+        <div class="text-center mb-8">
+            <h2 class="text-3xl font-bold text-gray-900 mb-2">Admin Dashboard</h2>
+            <p class="text-sm text-gray-600">Monitor and manage hospital operations</p>
+        </div>
+
+        <!-- Dashboard Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Patient Visit History -->
+            <div class="bg-white py-6 px-6 shadow-xl rounded-xl backdrop-blur-lg bg-opacity-90">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-medium text-gray-900">Patient Visit History</h3>
+                    <span class="text-blue-600 hover:text-blue-700 cursor-pointer">View All</span>
+                </div>
+                <div class="bg-gray-50 rounded-lg p-4">
+                    <ul class="divide-y divide-gray-200">
+                        {% for visit in recent_visits %}
+                        <li class="py-3">
+                            <div class="flex justify-between">
+                                <div>
+                                    <p class="text-sm font-medium text-gray-900">{{ visit.patient_name }}</p>
+                                    <p class="text-sm text-gray-500">{{ visit.doctor_name }}</p>
+                                </div>
+                                <p class="text-sm text-gray-500">{{ visit.date }}</p>
+                            </div>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Payment Records -->
+            <div class="bg-white py-6 px-6 shadow-xl rounded-xl backdrop-blur-lg bg-opacity-90">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-medium text-gray-900">Payment Records</h3>
+                    <span class="text-blue-600 hover:text-blue-700 cursor-pointer">View All</span>
+                </div>
+                <div class="bg-gray-50 rounded-lg p-4">
+                    <ul class="divide-y divide-gray-200">
+                        {% for payment in recent_payments %}
+                        <li class="py-3">
+                            <div class="flex justify-between">
+                                <div>
+                                    <p class="text-sm font-medium text-gray-900">{{ payment.patient_name }}</p>
+                                    <p class="text-sm text-gray-500">{{ payment.reference }}</p>
+                                </div>
+                                <p class="text-sm font-medium text-green-600">{{ payment.amount }} ETB</p>
+                            </div>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Doctor Schedules -->
+            <div class="bg-white py-6 px-6 shadow-xl rounded-xl backdrop-blur-lg bg-opacity-90">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-medium text-gray-900">Doctor Schedules</h3>
+                    <span class="text-blue-600 hover:text-blue-700 cursor-pointer">Manage</span>
+                </div>
+                <div class="bg-gray-50 rounded-lg p-4">
+                    <ul class="divide-y divide-gray-200">
+                        {% for doctor in doctors %}
+                        <li class="py-3">
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <p class="text-sm font-medium text-gray-900">{{ doctor.name }}</p>
+                                    <p class="text-sm text-gray-500">{{ doctor.specialty }}</p>
+                                </div>
+                                <span class="px-2 py-1 text-xs font-medium rounded-full {% if doctor.available %}bg-green-100 text-green-800{% else %}bg-red-100 text-red-800{% endif %}">
+                                    {{ "Available" if doctor.available else "Unavailable" }}
+                                </span>
+                            </div>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Patient Statistics -->
+            <div class="bg-white py-6 px-6 shadow-xl rounded-xl backdrop-blur-lg bg-opacity-90">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-medium text-gray-900">Patient Statistics</h3>
+                    <span class="text-blue-600 hover:text-blue-700 cursor-pointer">Details</span>
+                </div>
+                <div class="bg-gray-50 rounded-lg p-4">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="text-center p-4 bg-white rounded-lg shadow">
+                            <p class="text-2xl font-bold text-blue-600">{{ total_patients }}</p>
+                            <p class="text-sm text-gray-500">Total Patients</p>
+                        </div>
+                        <div class="text-center p-4 bg-white rounded-lg shadow">
+                            <p class="text-2xl font-bold text-green-600">{{ today_appointments }}</p>
+                            <p class="text-sm text-gray-500">Today's Appointments</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
