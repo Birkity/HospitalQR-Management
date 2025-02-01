@@ -1,7 +1,8 @@
-from flask import render_template, redirect, url_for, flash, request
+from flask import render_template, redirect, url_for, flash, request, session
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField
 from wtforms.validators import DataRequired, Email, EqualTo
+from flask_login import login_user, logout_user, login_required, current_user
 from . import auth_bp
 from ..models import User
 
@@ -37,7 +38,14 @@ def login():
     if form.validate_on_submit():
         user = User.find_by_email(form.email.data)
         if user and User.verify_password(user['password'], form.password.data):
+            login_user(User.create_from_db(user))  # Convert db user to User object
             flash('Login successful!', 'success')
             return redirect(url_for('main.index'))
         flash('Login unsuccessful. Please check email and password.', 'danger')
     return render_template('login.html', title='Login', form=form)
+
+@auth_bp.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for('main.index'))

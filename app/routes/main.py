@@ -4,6 +4,7 @@ from . import main_bp
 from ..models import User, Appointment, Doctor, Payment
 from ..services import generate_qr_code
 from flask import Blueprint  
+from flask_login import login_required, current_user
 
 main_bp = Blueprint('main', __name__)  
 
@@ -16,9 +17,10 @@ def test():
     return "Test route is working!"
 
 @main_bp.route('/appointments', methods=['GET', 'POST'])
+@login_required
 def manage_appointments():
     if request.method == 'POST':
-        patient_id = request.form['patient_id']
+        patient_id = current_user.get_id()  # Get ID from current_user
         doctor_id = request.form['doctor_id']
         appointment_date = request.form['appointment_date']
         appointment_time = request.form['appointment_time']
