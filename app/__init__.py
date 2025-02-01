@@ -5,14 +5,16 @@ from flask_wtf.csrf import CSRFProtect
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
-    
-    from .routes import main, auth
-    app.register_blueprint(main)
-    app.register_blueprint(auth)
-    
+
+    # Import and register blueprints correctly
+    from .routes.auth import auth_bp
+    from .routes.main import main_bp
+    app.register_blueprint(auth_bp)
+    app.register_blueprint(main_bp)
+
     CSRFProtect(app)
-    
-    # Initialize ChapaPayment for global usage within the app context
+
+    # Initialize ChapaPayment globally
     from .services.payment_gateway import ChapaPayment
     app.config['CHAPA_API'] = ChapaPayment()
 

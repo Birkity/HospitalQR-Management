@@ -5,6 +5,10 @@ from wtforms.validators import DataRequired, Email, EqualTo
 from . import auth_bp
 from ..models import User
 
+from flask import Blueprint  
+
+auth_bp = Blueprint('auth', __name__, url_prefix='/auth')
+
 class RegistrationForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired()])
     email = StringField('Email', validators=[DataRequired(), Email()])

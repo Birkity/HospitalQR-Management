@@ -3,6 +3,9 @@ from flask import abort, render_template, redirect, session, url_for, flash, req
 from . import main_bp
 from ..models import User, Appointment, Doctor, Payment
 from ..services import generate_qr_code
+from flask import Blueprint  
+
+main_bp = Blueprint('main', __name__)  
 
 @main_bp.route('/')
 def index():
