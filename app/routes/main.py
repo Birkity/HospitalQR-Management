@@ -1,4 +1,5 @@
-from flask import render_template, redirect, url_for, flash, request, current_app
+import datetime
+from flask import abort, render_template, redirect, session, url_for, flash, request, current_app
 from . import main
 from ..models import User, Appointment, Doctor, Payment
 from ..services import generate_qr_code
@@ -54,12 +55,48 @@ def payment_success():
 
 @main.route('/admin')
 def admin_dashboard():
-    # Here you would implement fetching data for admin dashboard
-    return render_template('admin_dashboard.html')
+    if 'user' not in session or not session['user'].get('is_admin'):
+        abort(403)  # Forbidden if not admin
+
+    try:
+        # Fetch data for the admin dashboard
+        patient_visits = list(Appointment.find().sort("appointment_date", -1).limit(10))
+        payment_records = list(Payment.find().sort("created_at", -1).limit(10))  # Assuming 'created_at' exists
+        doctors = Doctor.list_all()
+        doctors_count = len(doctors)
+        
+        # Most visited doctor
+        most_visited_doctor = max(doctors, key=lambda d: Appointment.count_documents({"doctor_id": str(d['_id'])}), default=None)
+        if most_visited_doctor:
+            most_visited_doctor['visit_count'] = Appointment.count_documents({"doctor_id": str(most_visited_doctor['_id'])})
+        
+        # Payment trends 
+        total_paid = sum(payment['amount'] for payment in payment_records)
+        
+        # Monthly revenue
+        today = datetime.datetime.now()
+        start_of_month = datetime.datetime(today.year, today.month, 1)
+        monthly_revenue = Payment.aggregate([
+            {"$match": {"status": "completed", "created_at": {"$gte": start_of_month}}},
+            {"$group": {"_id": None, "total": {"$sum": "$amount"}}}
+        ])
+        monthly_revenue = next(monthly_revenue, {'total': 0})['total'] if monthly_revenue else 0
+
+    except Exception as e:
+        flash(f'Error fetching dashboard data: {str(e)}', 'error')
+        return redirect(url_for('main.index'))
+
+    return render_template('admin_dashboard.html', 
+                           patient_visits=patient_visits,
+                           payment_records=payment_records,
+                           doctors=doctors,
+                           doctors_count=doctors_count,
+                           most_visited_doctor=most_visited_doctor,
+                           total_paid=total_paid,
+                           monthly_revenue=monthly_revenue)
 
 @main.route('/profile')
 def profile():
-    # Assuming user is logged in
-    user = User.find_by_email('current_user_email')  # Implement session management
+    user = User.find_by_email('current_user_email') 
     qr_code = generate_qr_code(user['qr_code'])
     return render_template('profile.html', qr_code=qr_code)
