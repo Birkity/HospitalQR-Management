@@ -1,0 +1,5 @@
+flask==2.0.1
+Flask-WTF==0.15.1
+Werkzeug==2.0.1
+qrcode[pil]  
+qrcode==7.3.1
