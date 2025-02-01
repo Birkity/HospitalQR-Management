@@ -12,4 +12,8 @@ def create_app():
     
     CSRFProtect(app)
     
+    # Initialize ChapaPayment for global usage within the app context
+    from .services.payment_gateway import ChapaPayment
+    app.config['CHAPA_API'] = ChapaPayment()
+
     return app
