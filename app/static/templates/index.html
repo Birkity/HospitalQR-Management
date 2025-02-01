@@ -2,5 +2,6 @@
 {% block content %}
     <h1>Welcome to Hospital Management</h1>
     <a href="{{ url_for('auth.login') }}">Login</a> | 
-    <a href="{{ url_for('auth.register') }}">Register</a>
+    <a href="{{ url_for('auth.register') }}">Register</a> |
+    <a href="{{ url_for('main.manage_appointments') }}">Book Appointment</a>
 {% endblock %}
