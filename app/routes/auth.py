@@ -1,6 +1,6 @@
 from flask import render_template, redirect, url_for, flash, request, session
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField
+from wtforms import StringField, PasswordField, SubmitField, BooleanField
 from wtforms.validators import DataRequired, Email, EqualTo
 from flask_login import login_user, logout_user, login_required, current_user
 from . import auth_bp
@@ -21,6 +21,7 @@ class RegistrationForm(FlaskForm):
 class LoginForm(FlaskForm):
     email = StringField('Email', validators=[DataRequired(), Email()])
     password = PasswordField('Password', validators=[DataRequired()])
+    remember = BooleanField('Remember Me')
     submit = SubmitField('Login')
 
 @auth_bp.route('/register', methods=['GET', 'POST'])
@@ -48,29 +49,26 @@ def register():
 
 @auth_bp.route('/login', methods=['GET', 'POST'])
 def login():
-    if request.method == 'POST':
-        email = request.form.get('email')
-        password = request.form.get('password')
-        
-        if not email or not password:
-            flash('Please provide both email and password', 'error')
-            return render_template('login.html')
+    form = LoginForm()
+    if form.validate_on_submit():
+        email = form.email.data
+        password = form.password.data
         
         user_data = User.find_by_email(email)
         if user_data:
             try:
                 user = User.create_from_db(user_data)
                 if user and user.check_password(password):
-                    login_user(user, remember=True)
+                    login_user(user, remember=form.remember.data)
                     next_page = request.args.get('next')
                     return redirect(next_page or url_for('main.index'))
             except Exception as e:
                 print(f"Error during login: {e}")
                 flash('An error occurred during login', 'error')
-                return render_template('login.html')
+                return render_template('login.html', form=form)
                 
         flash('Invalid email or password', 'error')
-    return render_template('login.html')
+    return render_template('login.html', form=form)
 
 @auth_bp.route('/logout')
 @login_required
