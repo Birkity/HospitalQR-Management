@@ -26,10 +26,11 @@ class LoginForm(FlaskForm):
 
 @auth_bp.route('/register', methods=['GET', 'POST'])
 def register():
-    if request.method == 'POST':
-        email = request.form.get('email')
-        password = request.form.get('password')
-        name = request.form.get('name')
+    form = RegistrationForm()
+    if form.validate_on_submit():
+        email = form.email.data
+        password = form.password.data
+        name = form.username.data  # Changed from request.form.get('name')
         
         if User.find_by_email(email):
             flash('Email already registered', 'error')
@@ -45,29 +46,34 @@ def register():
         flash('Registration successful!', 'success')
         return redirect(url_for('main.index'))
     
-    return render_template('register.html')
+    return render_template('register.html', form=form)
 
 @auth_bp.route('/login', methods=['GET', 'POST'])
 def login():
+    if current_user.is_authenticated:
+        return redirect(url_for('main.index'))
+        
     form = LoginForm()
     if form.validate_on_submit():
-        email = form.email.data
-        password = form.password.data
-        
-        user_data = User.find_by_email(email)
-        if user_data:
-            try:
+        try:
+            email = form.email.data
+            password = form.password.data
+            
+            user_data = User.find_by_email(email)
+            if user_data:
                 user = User.create_from_db(user_data)
                 if user and user.check_password(password):
                     login_user(user, remember=form.remember.data)
                     next_page = request.args.get('next')
                     return redirect(next_page or url_for('main.index'))
-            except Exception as e:
-                print(f"Error during login: {e}")
-                flash('An error occurred during login', 'error')
-                return render_template('login.html', form=form)
-                
-        flash('Invalid email or password', 'error')
+                else:
+                    flash('Invalid password', 'error')
+            else:
+                flash('Email not found', 'error')
+        except Exception as e:
+            print(f"Error during login: {e}")
+            flash('An error occurred during login', 'error')
+    
     return render_template('login.html', form=form)
 
 @auth_bp.route('/logout')

@@ -30,42 +30,22 @@ class Patient:
         if db.patients.count_documents({}) == 0:  # Check if collection is empty
             dummy_patients = [
                 {
-                    "name": "John Smith",
-                    "email": "john.smith@example.com",
+                    "name": "John Doe",
+                    "email": "john@example.com",
                     "phone": "+251911111111",
-                    "date_of_birth": "1990-05-15",
+                    "date_of_birth": "1990-01-01",
                     "registration_date": datetime.now()
                 },
                 {
-                    "name": "Sarah Johnson",
-                    "email": "sarah.j@example.com",
+                    "name": "Jane Smith",
+                    "email": "jane@example.com",
                     "phone": "+251922222222",
-                    "date_of_birth": "1985-08-22",
-                    "registration_date": datetime.now()
-                },
-                {
-                    "name": "Michael Brown",
-                    "email": "michael.b@example.com",
-                    "phone": "+251933333333",
-                    "date_of_birth": "1978-12-10",
-                    "registration_date": datetime.now()
-                },
-                {
-                    "name": "Emma Wilson",
-                    "email": "emma.w@example.com",
-                    "phone": "+251944444444",
-                    "date_of_birth": "1995-03-28",
-                    "registration_date": datetime.now()
-                },
-                {
-                    "name": "David Lee",
-                    "email": "david.lee@example.com",
-                    "phone": "+251955555555",
-                    "date_of_birth": "1982-07-14",
+                    "date_of_birth": "1992-05-15",
                     "registration_date": datetime.now()
                 }
             ]
             db.patients.insert_many(dummy_patients)
+            print("Dummy patient data initialized")
 
     def generate_qr_code(self):
         """Generate QR code containing patient information"""
@@ -110,4 +90,11 @@ class Patient:
             user_id=str(user._id)
         )
         patient_id = patient.save_to_db()
-        return patient_id 
+        return patient_id
+
+    @staticmethod
+    def find_by_user_id(user_id):
+        """Find patient by associated user ID"""
+        if isinstance(user_id, str):
+            return db.patients.find_one({'user_id': user_id})
+        return None 
