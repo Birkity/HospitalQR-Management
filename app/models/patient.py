@@ -90,11 +90,22 @@ class Patient:
             user_id=str(user._id)
         )
         patient_id = patient.save_to_db()
+        patient._id = patient_id  # Set the _id after saving to the database
         return patient_id
 
     @staticmethod
     def find_by_user_id(user_id):
         """Find patient by associated user ID"""
         if isinstance(user_id, str):
-            return db.patients.find_one({'user_id': user_id})
+            patient_data = db.patients.find_one({'user_id': user_id})
+            if patient_data:
+                patient = Patient(
+                    name=patient_data['name'],
+                    email=patient_data['email'],
+                    phone=patient_data.get('phone', ''),
+                    date_of_birth=patient_data.get('date_of_birth', ''),
+                    user_id=patient_data['user_id']
+                )
+                patient._id = patient_data['_id']  # Set the _id from the database
+                return patient
         return None 

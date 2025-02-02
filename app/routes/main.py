@@ -151,15 +151,7 @@ def profile():
     user_id = current_user.get_id()
     patient = Patient.find_by_user_id(user_id)
     if patient:
-        # Create patient object to generate QR code
-        patient_obj = Patient(
-            name=patient['name'],
-            email=patient['email'],
-            phone=patient.get('phone', ''),
-            date_of_birth=patient.get('date_of_birth', ''),
-            user_id=user_id
-        )
-        qr_code = patient_obj.generate_qr_code()
+        qr_code = patient.generate_qr_code()
         return render_template('profile.html', patient=patient, qr_code=qr_code)
     flash('Patient profile not found', 'error')
     return redirect(url_for('main.index'))
