@@ -26,11 +26,29 @@
                     </div>
                 </div>
                 <div class="flex items-center">
-                    <div class="flex-shrink-0">
-                        <a href="{{ url_for('auth.login') }}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">
-                            Login
-                        </a>
-                    </div>
+                    {% if current_user.is_authenticated %}
+                        <div class="flex-shrink-0">
+                            <a href="{{ url_for('main.profile') }}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">
+                                Profile
+                            </a>
+                        </div>
+                        <div class="flex-shrink-0">
+                            <a href="{{ url_for('auth.logout') }}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">
+                                Logout
+                            </a>
+                        </div>
+                    {% else %}
+                        <div class="flex-shrink-0">
+                            <a href="{{ url_for('auth.login') }}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">
+                                Login
+                            </a>
+                        </div>
+                        <div class="flex-shrink-0">
+                            <a href="{{ url_for('auth.register') }}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">
+                                Register
+                            </a>
+                        </div>
+                    {% endif %}
                 </div>
             </div>
         </div>
