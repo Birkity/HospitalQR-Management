@@ -32,9 +32,15 @@ def create_app(config_class=Config):
 
     @login_manager.user_loader
     def load_user(user_id):
-        user_data = User.find_by_id(user_id)
-        if user_data:
-            return User.create_from_db(user_data)
-        return None
+        if not user_id:
+            return None
+        try:
+            user_data = User.find_by_id(user_id)
+            if user_data:
+                return User.create_from_db(user_data)
+            return None
+        except Exception as e:
+            print(f"Error loading user: {e}")
+            return None
 
     return app

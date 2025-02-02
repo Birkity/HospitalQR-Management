@@ -52,18 +52,32 @@ def login():
         email = request.form.get('email')
         password = request.form.get('password')
         
+        if not email or not password:
+            flash('Please provide both email and password', 'error')
+            return render_template('login.html')
+        
         user_data = User.find_by_email(email)
         if user_data:
-            user = User.create_from_db(user_data)
-            if user and user.check_password(password):
-                login_user(user, remember=True)
-                next_page = request.args.get('next')
-                return redirect(next_page or url_for('main.index'))
+            try:
+                user = User.create_from_db(user_data)
+                if user and user.check_password(password):
+                    login_user(user, remember=True)
+                    next_page = request.args.get('next')
+                    return redirect(next_page or url_for('main.index'))
+            except Exception as e:
+                print(f"Error during login: {e}")
+                flash('An error occurred during login', 'error')
+                return render_template('login.html')
+                
         flash('Invalid email or password', 'error')
     return render_template('login.html')
 
 @auth_bp.route('/logout')
 @login_required
 def logout():
-    logout_user()
+    try:
+        logout_user()
+        session.clear()  # Clear all session data
+    except Exception as e:
+        print(f"Error during logout: {e}")
     return redirect(url_for('main.index'))

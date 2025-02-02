@@ -30,7 +30,9 @@ class User(UserMixin):
         return self._id
 
     def get_id(self):
-        return str(self._id)
+        if self._id:
+            return str(self._id)
+        return None
 
     @staticmethod
     def find_by_email(email):
@@ -38,9 +40,14 @@ class User(UserMixin):
 
     @staticmethod
     def find_by_id(user_id):
-        if isinstance(user_id, str):
-            user_id = ObjectId(user_id)
-        return db.users.find_one({'_id': user_id})
+        if not user_id:
+            return None
+        try:
+            if isinstance(user_id, str):
+                user_id = ObjectId(user_id)
+            return db.users.find_one({'_id': user_id})
+        except:
+            return None
 
     @classmethod
     def create_from_db(cls, user_data):
