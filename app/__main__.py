@@ -9,4 +9,4 @@ Doctor.initialize_dummy_data()
 Patient.initialize_dummy_data()  
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, port=8000)
