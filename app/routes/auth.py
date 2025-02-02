@@ -4,7 +4,8 @@ from wtforms import StringField, PasswordField, SubmitField
 from wtforms.validators import DataRequired, Email, EqualTo
 from flask_login import login_user, logout_user, login_required, current_user
 from . import auth_bp
-from ..models import User
+from ..models.user import User
+from ..models.patient import Patient
 
 from flask import Blueprint  
 
@@ -24,26 +25,42 @@ class LoginForm(FlaskForm):
 
 @auth_bp.route('/register', methods=['GET', 'POST'])
 def register():
-    form = RegistrationForm()
-    if form.validate_on_submit():
-        user = User(form.username.data, form.email.data, form.password.data, "patient")
-        user.save_to_db()
+    if request.method == 'POST':
+        email = request.form.get('email')
+        password = request.form.get('password')
+        name = request.form.get('name')
+        
+        if User.find_by_email(email):
+            flash('Email already registered', 'error')
+            return redirect(url_for('auth.register'))
+        
+        user = User(email=email, password=password, name=name)
+        user_id = user.save_to_db()
+        
+        # Create associated patient record
+        Patient.create_from_user(user)
+        
+        login_user(user)
         flash('Registration successful!', 'success')
-        return redirect(url_for('auth.login'))
-    return render_template('register.html', form=form)
+        return redirect(url_for('main.index'))
+    
+    return render_template('register.html')
 
 @auth_bp.route('/login', methods=['GET', 'POST'])
 def login():
-    form = LoginForm()
-    if form.validate_on_submit():
-        user_data = User.find_by_email(form.email.data)
-        if user_data and User.verify_password(user_data, form.password.data):
+    if request.method == 'POST':
+        email = request.form.get('email')
+        password = request.form.get('password')
+        
+        user_data = User.find_by_email(email)
+        if user_data:
             user = User.create_from_db(user_data)
-            login_user(user)
-            flash('Login successful!', 'success')
-            return redirect(url_for('main.index'))
-        flash('Login unsuccessful. Please check email and password.', 'danger')
-    return render_template('login.html', title='Login', form=form)
+            if user and user.check_password(password):
+                login_user(user, remember=True)
+                next_page = request.args.get('next')
+                return redirect(next_page or url_for('main.index'))
+        flash('Invalid email or password', 'error')
+    return render_template('login.html')
 
 @auth_bp.route('/logout')
 @login_required

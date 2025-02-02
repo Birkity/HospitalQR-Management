@@ -19,8 +19,15 @@ def test():
 @main_bp.route('/appointments', methods=['GET', 'POST'])
 @login_required
 def manage_appointments():
+    if not current_user.is_authenticated:
+        return redirect(url_for('auth.login'))
+        
     if request.method == 'POST':
-        patient_id = current_user.get_id()
+        patient = Patient.find_by_user_id(current_user.get_id())
+        if not patient:
+            flash('Patient profile not found', 'error')
+            return redirect(url_for('main.index'))
+            
         doctor_id = request.form['doctor_id']
         appointment_date = request.form['appointment_date']
         appointment_time = request.form['appointment_time']
@@ -28,7 +35,7 @@ def manage_appointments():
         
         # Create appointment
         appointment = Appointment(
-            patient_id=patient_id,
+            patient_id=str(patient['_id']),
             doctor_id=doctor_id,
             appointment_date=appointment_date,
             appointment_time=appointment_time,
@@ -42,28 +49,31 @@ def manage_appointments():
         amount = 500  # Set your consultation fee
         tx_ref = f"tx-{appointment_id}"
         
-        payment_data = chapa.initialize_payment(
-            amount=amount,
-            email=current_user.email,
-            first_name=current_user.username.split()[0],
-            last_name=current_user.username.split()[-1],
-            tx_ref=tx_ref
-        )
-        
-        if payment_data.get('status') == 'success':
-            # Save payment record
-            payment = Payment(
-                appointment_id=str(appointment_id),
+        try:
+            payment_data = chapa.initialize_payment(
                 amount=amount,
-                payment_method="chapa",
-                status="pending",
-                transaction_id=tx_ref
+                email=current_user.email,
+                first_name=current_user.name.split()[0],
+                last_name=current_user.name.split()[-1] if len(current_user.name.split()) > 1 else "",
+                tx_ref=tx_ref
             )
-            payment.save_to_db()
             
-            return redirect(payment_data['data']['checkout_url'])
-        
-        flash('Payment initialization failed. Please try again.', 'error')
+            if payment_data.get('status') == 'success':
+                payment = Payment(
+                    appointment_id=str(appointment_id),
+                    amount=amount,
+                    payment_method="chapa",
+                    status="pending",
+                    transaction_id=tx_ref
+                )
+                payment.save_to_db()
+                
+                return redirect(payment_data['data']['checkout_url'])
+            
+            flash('Payment initialization failed. Please try again.', 'error')
+        except Exception as e:
+            flash(f'Error processing payment: {str(e)}', 'error')
+            
         return redirect(url_for('main.appointments'))
     
     doctors = Doctor.list_all()

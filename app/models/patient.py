@@ -10,11 +10,12 @@ client = MongoClient(Config.MONGODB_URI)
 db = client.hospital_db
 
 class Patient:
-    def __init__(self, name, email, phone, date_of_birth):
+    def __init__(self, name, email, phone, date_of_birth, user_id=None):
         self.name = name
         self.email = email
         self.phone = phone
         self.date_of_birth = date_of_birth
+        self.user_id = user_id
         self.registration_date = datetime.now()
 
     def save_to_db(self):
@@ -96,4 +97,17 @@ class Patient:
     def find_by_id(patient_id):
         if isinstance(patient_id, str):
             patient_id = ObjectId(patient_id)
-        return db.patients.find_one({'_id': patient_id}) 
+        return db.patients.find_one({'_id': patient_id})
+
+    @classmethod
+    def create_from_user(cls, user):
+        """Create a patient record from a user account"""
+        patient = cls(
+            name=user.name,
+            email=user.email,
+            phone="",  # Can be updated later
+            date_of_birth="",  # Can be updated later
+            user_id=str(user._id)
+        )
+        patient_id = patient.save_to_db()
+        return patient_id 
