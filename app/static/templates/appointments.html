@@ -21,12 +21,21 @@
                 <div>
                     <label for="doctor_id" class="block text-sm font-medium text-gray-700 mb-1">Select Doctor</label>
                     <select name="doctor_id" id="doctor_id" required
-                        class="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm">
+                        class="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
+                        onchange="updateAvailability()">
                         <option value="">Choose a doctor</option>
                         {% for doctor in doctors %}
-                            <option value="{{ doctor._id }}">{{ doctor.name }} ({{ doctor.specialty }})</option>
+                            <option value="{{ doctor._id }}" data-availability="{{ doctor.availability | join(',') }}">{{ doctor.name }} ({{ doctor.specialty }})</option>
                         {% endfor %}
                     </select>
+                </div>
+
+                <!-- Display Doctor Availability -->
+                <div>
+                    <h3 class="text-lg font-medium text-gray-900 mb-4">Doctor Availability</h3>
+                    <ul id="availability-list" class="list-disc pl-5">
+                        <li>Select a doctor to see available times</li>
+                    </ul>
                 </div>
 
                 <!-- Date and Time Selection -->
@@ -67,4 +76,20 @@
         </div>
     </div>
 </div>
+
+<script>
+function updateAvailability() {
+    const doctorSelect = document.getElementById('doctor_id');
+    const availabilityList = document.getElementById('availability-list');
+    const selectedOption = doctorSelect.options[doctorSelect.selectedIndex];
+    const availability = selectedOption.getAttribute('data-availability');
+
+    if (availability) {
+        const times = availability.split(',').map(time => time.trim());
+        availabilityList.innerHTML = times.length > 0 ? times.map(time => `<li>${time}</li>`).join('') : '<li>No available times</li>';
+    } else {
+        availabilityList.innerHTML = '<li>Select a doctor to see available times</li>';
+    }
+}
+</script>
 {% endblock %}

@@ -88,25 +88,60 @@
             </div>
 
             <!-- Patient Statistics -->
-            <div class="bg-white py-6 px-6 shadow-xl rounded-xl backdrop-blur-lg bg-opacity-90">
-                <div class="flex items-center justify-between mb-4">
-                    <h3 class="text-lg font-medium text-gray-900">Patient Statistics</h3>
-                    <span class="text-blue-600 hover:text-blue-700 cursor-pointer">Details</span>
-                </div>
-                <div class="bg-gray-50 rounded-lg p-4">
-                    <div class="grid grid-cols-2 gap-4">
-                        <div class="text-center p-4 bg-white rounded-lg shadow">
-                            <p class="text-2xl font-bold text-blue-600">{{ total_patients }}</p>
-                            <p class="text-sm text-gray-500">Total Patients</p>
-                        </div>
-                        <div class="text-center p-4 bg-white rounded-lg shadow">
-                            <p class="text-2xl font-bold text-green-600">{{ today_appointments }}</p>
-                            <p class="text-sm text-gray-500">Today's Appointments</p>
-                        </div>
-                    </div>
-                </div>
+            <div class="bg-white shadow-md rounded-lg p-6">
+                <h3 class="text-lg font-medium text-gray-900">Patient Statistics</h3>
+                <canvas id="patientStatsChart"></canvas>
+            </div>
+
+            <!-- Payment Trends -->
+            <div class="bg-white shadow-md rounded-lg p-6">
+                <h3 class="text-lg font-medium text-gray-900">Payment Trends</h3>
+                <canvas id="paymentTrendsChart"></canvas>
             </div>
         </div>
     </div>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const ctx1 = document.getElementById('patientStatsChart').getContext('2d');
+    const patientStatsChart = new Chart(ctx1, {
+        type: 'bar',
+        data: {
+            labels: ['Doctor A', 'Doctor B', 'Doctor C'],
+            datasets: [{
+                label: 'Visits',
+                data: [12, 19, 3],
+                backgroundColor: ['rgba(75, 192, 192, 0.2)'],
+                borderColor: ['rgba(75, 192, 192, 1)'],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                y: { beginAtZero: true }
+            }
+        }
+    });
+
+    const ctx2 = document.getElementById('paymentTrendsChart').getContext('2d');
+    const paymentTrendsChart = new Chart(ctx2, {
+        type: 'line',
+        data: {
+            labels: ['January', 'February', 'March'],
+            datasets: [{
+                label: 'Payments',
+                data: [300, 500, 400],
+                backgroundColor: 'rgba(153, 102, 255, 0.2)',
+                borderColor: 'rgba(153, 102, 255, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                y: { beginAtZero: true }
+            }
+        }
+    });
+</script>
 {% endblock %}

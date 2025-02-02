@@ -6,6 +6,7 @@ app = create_app()
 
 # Initialize dummy doctor data
 Doctor.initialize_dummy_data()
+
 Patient.initialize_dummy_data()  
 
 if __name__ == '__main__':

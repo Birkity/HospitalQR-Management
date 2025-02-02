@@ -1,13 +1,15 @@
 import datetime
 from flask import abort, render_template, redirect, session, url_for, flash, request, current_app
 from . import main_bp
-from ..models import User, Appointment, Doctor, Payment, Patient
+from ..models import User, Appointment, Doctor, Payment, Patient, db
 from ..services import generate_qr_code
 from flask import Blueprint  
 from flask_login import login_required, current_user
 from flask_wtf import FlaskForm
 from wtforms import SelectField, DateField, TimeField, TextAreaField, SubmitField
 from wtforms.validators import DataRequired
+from pymongo import MongoClient
+from bson.objectid import ObjectId
 
 main_bp = Blueprint('main', __name__)  
 
@@ -32,6 +34,9 @@ def manage_appointments():
     if not current_user.is_authenticated:
         return redirect(url_for('auth.login'))
         
+    form = AppointmentForm()
+    doctors = Doctor.list_all()
+
     if request.method == 'POST':
         patient = Patient.find_by_user_id(current_user.get_id())
         if not patient:
@@ -43,9 +48,15 @@ def manage_appointments():
         appointment_time = request.form['appointment_time']
         notes = request.form.get('notes', "")
         
+        # Check doctor availability
+        doctor = db.doctors.find_one({'_id': ObjectId(doctor_id)})
+        if appointment_time not in doctor['availability']:
+            flash('Selected time is not available for this doctor.', 'error')
+            return redirect(url_for('main.manage_appointments'))
+        
         # Create appointment
         appointment = Appointment(
-            patient_id=str(patient['_id']),
+            patient_id=str(patient._id),
             doctor_id=doctor_id,
             appointment_date=appointment_date,
             appointment_time=appointment_time,
@@ -83,11 +94,7 @@ def manage_appointments():
             flash('Payment initialization failed. Please try again.', 'error')
         except Exception as e:
             flash(f'Error processing payment: {str(e)}', 'error')
-            
-        return redirect(url_for('main.appointments'))
-    
-    form = AppointmentForm()
-    doctors = Doctor.list_all()
+
     return render_template('appointments.html', form=form, doctors=doctors)
 
 @main_bp.route('/payment/<appointment_id>')

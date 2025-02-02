@@ -30,21 +30,16 @@ def register():
     if form.validate_on_submit():
         email = form.email.data
         password = form.password.data
-        name = form.username.data  # Changed from request.form.get('name')
+        name = form.username.data
         
         if User.find_by_email(email):
             flash('Email already registered', 'error')
             return redirect(url_for('auth.register'))
         
         user = User(email=email, password=password, name=name)
-        user_id = user.save_to_db()
-        
-        # Create associated patient record
-        Patient.create_from_user(user)
-        
-        login_user(user)
-        flash('Registration successful!', 'success')
-        return redirect(url_for('main.index'))
+        user.save_to_db()
+        flash('Registration successful. Please log in.', 'success')
+        return redirect(url_for('auth.login'))
     
     return render_template('register.html', form=form)
 

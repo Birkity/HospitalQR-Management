@@ -25,9 +25,10 @@ class User(UserMixin):
             'name': self.name,
             'is_admin': self.is_admin
         }
-        result = db.users.insert_one(user_data)
-        self._id = result.inserted_id
-        return self._id
+        if self._id:
+            db.users.update_one({'_id': self._id}, {'$set': user_data})
+        else:
+            self._id = db.users.insert_one(user_data).inserted_id
 
     def get_id(self):
         if self._id:
