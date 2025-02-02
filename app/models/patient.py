@@ -28,6 +28,7 @@ class Patient:
     @staticmethod
     def initialize_dummy_data():
         if db.patients.count_documents({}) == 0:  # Check if collection is empty
+            print("Initializing dummy patient data...")  # Debugging statement
             dummy_patients = [
                 {
                     "name": "John Doe",

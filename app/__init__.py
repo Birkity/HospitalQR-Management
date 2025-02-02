@@ -7,6 +7,7 @@ from .services.payment_gateway import ChapaPayment
 
 login_manager = LoginManager()
 chapa_payment = ChapaPayment()
+csrf = CSRFProtect()
 
 def create_app(config_class=Config):
     app = Flask(__name__)
@@ -21,7 +22,7 @@ def create_app(config_class=Config):
     app.register_blueprint(main_bp)
     app.register_blueprint(admin_bp)
 
-    CSRFProtect(app)
+    csrf.init_app(app)
 
     # Initialize ChapaPayment globally
     chapa_payment.init_app(app)

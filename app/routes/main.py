@@ -5,6 +5,9 @@ from ..models import User, Appointment, Doctor, Payment, Patient
 from ..services import generate_qr_code
 from flask import Blueprint  
 from flask_login import login_required, current_user
+from flask_wtf import FlaskForm
+from wtforms import SelectField, DateField, TimeField, TextAreaField, SubmitField
+from wtforms.validators import DataRequired
 
 main_bp = Blueprint('main', __name__)  
 
@@ -15,6 +18,13 @@ def index():
 @main_bp.route('/test')
 def test():
     return "Test route is working!"
+
+class AppointmentForm(FlaskForm):
+    doctor_id = SelectField('Doctor', validators=[DataRequired()])
+    appointment_date = DateField('Date', validators=[DataRequired()])
+    appointment_time = TimeField('Time', validators=[DataRequired()])
+    notes = TextAreaField('Notes')
+    submit = SubmitField('Book Appointment')
 
 @main_bp.route('/appointments', methods=['GET', 'POST'])
 @login_required
@@ -76,8 +86,9 @@ def manage_appointments():
             
         return redirect(url_for('main.appointments'))
     
+    form = AppointmentForm()
     doctors = Doctor.list_all()
-    return render_template('appointments.html', doctors=doctors)
+    return render_template('appointments.html', form=form, doctors=doctors)
 
 @main_bp.route('/payment/<appointment_id>')
 def payment(appointment_id):
